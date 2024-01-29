@@ -4,8 +4,8 @@ This repository contains all Cash Eyes api routes
 
 ## Packages
 
-- `bcryptjs` [source](https://www.npmjs.com/package/bcryptjs) - A powerful Node.js module for salt passwords
-- `cookie-parser` [source](https://www.npmjs.com/package/cookie-parser) - A module used to retrieve web cookies
+- `bcryptjs` ([source](https://www.npmjs.com/package/bcryptjs)) - A powerful Node.js module for salt passwords
+- `cookie-parser` ([source](https://www.npmjs.com/package/cookie-parser)) - A module used to retrieve web cookies
 - `dotenv` ([source](https://www.npmjs.com/package/dotenv)) - A module for loads environment variables from a `.env` file intro `process.env`.
 - `email-validator` ([source](https://www.npmjs.com/package/email-validator)) - A wonderful tool for validating e-mail addresses
 - `express` ([source](https://www.npmjs.com/package/express)) - A minimalist web framework ✨
