@@ -17,7 +17,7 @@ export default class Compte {
       return ReturnMessageCUP(result_Id[0], "Compte crée");
     } catch (err) {
       if(err.cause === undefined){
-        return CatchErrorMessage(true,{functionErrorName: "CREATE COMPTE", totalErrParams: err, basefilename: "category", basedirname: "models"});
+        return CatchErrorMessage(true,{functionErrorName: "CREATE COMPTE", totalErrParams: err, basefilename: "compte", basedirname: "models"});
       }else{
         return CatchErrorMessage(false, {code: err.cause.code, reason: err.cause.reason});
       }
@@ -26,6 +26,11 @@ export default class Compte {
 
   static updateCompte = async (params = {montant: 0}, condition = { id }) => {
     try {
+      if(Object.keys(params).length === 0) return CatchErrorMessage(false, {
+        code: errorCode.NotAcceptable,
+        reason: "Merci de donner au moins une valeur de modification.",
+      })
+      
       let paramsObj = await Compte.modelNormilizer(params);
       let return_Id = await db("compte")
         .update(paramsObj, ["id"])
@@ -41,11 +46,11 @@ export default class Compte {
     }
   }
 
-  static destroyCompte = async (condition = { id, user_id }) => {
+  static destroyCompte = async (condition = {id, user_id}) => {
     try {
-      if (condition.id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
+      if(Object.keys(condition).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
-        reason: "Certaines informations obligatoires sont manquantes."
+        reason: "Certaines informations obligatoires sont manquantes.",
       })
 
       condition = suppNotUsed(condition)
@@ -53,11 +58,11 @@ export default class Compte {
       let select_info = await Compte.selectCompte(condition);
       if (select_info.success == false) return select_info;
 
-      Objectif.destroyObjectif({compte_id : select_info.data[0].id})
-      Transaction.destroyTransaction({compte_id : select_info.data[0].id})
-      Facture.destroyFacture({compte_id : select_info.data[0].id})
+      await Objectif.destroyObjectif({compte_id : select_info.data[0].id})
+      await Transaction.destroyTransaction({compte_id : select_info.data[0].id})
+      await Facture.destroyFacture({compte_id : select_info.data[0].id})
 
-      let return_Id = await db("budget")
+      let return_Id = await db("compte")
       .where(condition)
       .del(["id"]);
 
@@ -67,9 +72,9 @@ export default class Compte {
     }
   }
 
-  static selectCompte = async (condition = { id, user_id  }) => {
+  static selectCompte = async (condition = {id, user_id}) => {
     try {
-      if(condition.id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
+      if(Object.keys(condition).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
         reason: "Des paramètres obligatoires sont manquants."
       })
@@ -88,23 +93,23 @@ export default class Compte {
           data: select_info,
       };
     } catch (err) {
-      return CatchErrorMessage(true,{functionErrorName: "SELECT CATEGORY", totalErrParams: err, basefilename:"compte", basedirname: "models"})
+      return CatchErrorMessage(true,{functionErrorName: "SELECT COMPTE", totalErrParams: err, basefilename:"compte", basedirname: "models"})
     }
   }
 
   /* normalise la data */
   static modelNormilizer = async ( params = {user_id, montant, type}, obligatoire = false ) => {
-    if (obligatoire == true && (!params.montant || !params.user_id || !params.type)) return errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
+    if (obligatoire == true && ((!params.montant && params.montant !== 0)|| !params.user_id || !params.type)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
     if(params.user_id){
       let isRealUser = await VerifTable("user", params.user_id)
-      if(isRealUser.success == false) return errorResponse({reason:"Utilisateur invalide"})
+      if(isRealUser.success == false) throw errorResponse({reason:"Utilisateur invalide"})
     }
 
-    if(params.type && (parseInt(params.type) === NaN || params.type > 4 || params.type <= 0)) return errorResponse({reason:"Le type n'est pas valide"})
+    if(params.type && (isNaN(parseInt(params.type)) || params.type > 17 || params.type <= 0)) throw errorResponse({reason:"Le type n'est pas valide"})
 
-    if(params.montant && (parseInt(params.montant) === NaN)) return errorResponse({reason:"Le montant doit être un nombre"})
-    
+    if(params.montant && isNaN(parseInt(params.montant))) throw errorResponse({reason:"Le montant doit être un nombre"})
+
     return suppNotUsed(params);
   };
 };

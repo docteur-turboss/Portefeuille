@@ -13,7 +13,7 @@ export let CreateUsercontroller = async (req, res, next) => {
     let params = await User.createUser({
       username: req.fields.username,
       email: req.fields.email,
-      password: hashSync(scryptSync(req.fields.password, 'BonsourCetaitUnTest,RetireEnProdSTP.', 24, { N: 1024 }).toString('hex'), 10)
+      password: (req.fields.password !== undefined)? hashSync(scryptSync(req.fields.password, 'BonsourCetaitUnTest,RetireEnProdSTP.', 24, { N: 1024 }).toString('hex'), 10) : ''
     });
     if (params.success == false) throw errorResponse(params)
 
@@ -23,7 +23,7 @@ export let CreateUsercontroller = async (req, res, next) => {
     /*{success:true,data:{token:validAuth.token}} //cookie : auth*/
     /*OR return={success:false,code:string,reason:string}*/
     return sendToken(
-      { token: paramsCookie.data.token, cookieSecure: paramsCookie.data.cookieSecure },
+      { token: paramsCookie.data.token, cookieSecure: paramsCookie.data.cookieSecure, id: params.data.id},
       res,
       next
     );
@@ -55,7 +55,7 @@ export let UpdateUsercontroller = async (req, res, next) => {
     let params = await User.updateUser({
       email : req.fields.email,
       username : req.fields.username,
-      password: hashSync(scryptSync(req.fields.password, 'BonsourCetaitUnTest,RetireEnProdSTP.', 24, { N: 1024 }).toString('hex'), 10)
+      password: (req.fields.password !== undefined)? hashSync(scryptSync(req.fields.password, 'BonsourCetaitUnTest,RetireEnProdSTP.', 24, { N: 1024 }).toString('hex'), 10) : ''
     }, { id: req.UserID });
     if(params.success == false) throw errorResponse(params)
   
@@ -65,7 +65,7 @@ export let UpdateUsercontroller = async (req, res, next) => {
     /*{success:true,data:{token:validAuth.token}} //cookie : auth*/
     /*OR return={success:false,code:string,reason:string}*/      
     return sendToken(
-      { token: CookiesSecure.data.token, cookieSecure: CookiesSecure.data.cookieSecure },
+      { token: CookiesSecure.data.token, cookieSecure: CookiesSecure.data.cookieSecure, id: req.UserID },
       res
     );
   }catch(err){
@@ -101,7 +101,7 @@ export let ReadUserParams = async (req, res, next) => {
   
     /*{success:true,data:{token:validAuth.token}} //cookie : auth*/
     /*OR return={success:false,code:string,reason:string}*/
-    return sendToken({cookieSecure : params.data.auth.cookieSecure, token : params.data.auth.token}, res);
+    return sendToken({cookieSecure : params.data.auth.cookieSecure, token : params.data.auth.token, id : params.data.id}, res);
   }catch(err){
     /* return={success:false,code:string,reason:string}*/
     if(err.cause === undefined) CatchLogMessageController(err, "user", "controller")

@@ -23,6 +23,11 @@ export default class Budget {
 
   static updateBudget = async (params = { montant, rollover }, condition = { id }) => {
     try {
+      if(Object.keys(params).length === 0) return CatchErrorMessage(false, {
+        code: errorCode.NotAcceptable,
+        reason: "Merci de donner au moins une valeur de modification.",
+      })
+
       let paramsObj = await Budget.modelNormilizer(params);
       let return_Id = await db("budget")
       .update(paramsObj, ["id"])
@@ -40,7 +45,7 @@ export default class Budget {
 
   static destroyBudget = async (condition = { id, category_id, user_id }) => {
     try {
-      if (condition.id == undefined && condition.category_id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
+      if (Object.keys(condition).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
         reason: "Certaines informations obligatoires sont manquantes.",
       })
@@ -62,7 +67,7 @@ export default class Budget {
 
   static selectBudget = async (condition = { id, user_id, category_id }) => {
     try {
-        if(condition.id == undefined && condition.category_id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
+        if (Object.keys(condition).length === 0) return CatchErrorMessage(false, {
           code: errorCode.NotAcceptable,
           reason: "Des paramètres obligatoires sont manquants."
         })
@@ -98,12 +103,12 @@ export default class Budget {
       let isRealCategory = await VerifTable("category", params.category_id)
       if(isRealCategory.success == false) throw errorResponse({reason:"Catégorie invalide"})
     }
+    
+    if(params.montant && (isNaN(parseInt(params.montant)) || params.montant <= 0)) throw errorResponse({reason:"Le montant est un nombre positif"})
 
-    if(params.montant && (parseInt(params.montant) === NaN || params.montant <= 0)) throw errorResponse({reason:"Le montant est un nombre positif"})
-
-    if(params.rollover && (params.rollover !== true && params.rollover !== false)) throw errorResponse({reason:"La valeur de rollover est invalide"})
-    if(params.rollover && params === true) params.rollover = 1
-    if(params.rollover && params === false) params.rollover = 0
+    if(params.rollover !== undefined && (params.rollover !== true && params.rollover !== false)) throw errorResponse({reason:"La valeur de rollover est invalide"})
+    if(params.rollover !== undefined && params.rollover == true){ params.rollover = 1}
+    if(params.rollover !== undefined && params.rollover == false){ params.rollover = 0}
 
     return suppNotUsed(params);
   };

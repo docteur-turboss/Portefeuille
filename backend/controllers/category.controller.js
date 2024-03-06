@@ -4,9 +4,8 @@ import Category from "../models/category.models.js"
 
 export let CreateCategorycontroller = async (req, res, next) => {
     try{
-        /*{user_id:int, name:string, [icon:string], type:int}*/
+        /*{user_id:int, name:string, type:int}*/
         let params = await Category.createCategory({
-            icon: req.fields.icon, 
             name: req.fields.name, 
             type: req.fields.type, 
             user_id: req.UserID
@@ -42,10 +41,9 @@ export let ReadCategorycontroller = async (req, res, next) => {
 
 export let UpdateCategorycontroller = async (req, res, next) => {
     try{
-        /*{name:string, [icon:string], type:int, id:int}*/
+        /*{name:string, type:int, id:int}*/
         let params = await Category.updateCategory(
             {
-                icon: req.fields.icon, 
                 name: req.fields.name, 
             },{
                 id: req.fields.id

@@ -1,6 +1,6 @@
 import { ErrorException } from '../models/error.models.js';
 
-export default (validAuth = {token, cookieSecure}, res, next) => {
+export default (validAuth = {token, cookieSecure, id}, res, next) => {
     try{
         /* options for cookie */
         const options = {
@@ -15,6 +15,7 @@ export default (validAuth = {token, cookieSecure}, res, next) => {
         res.status(200).json({
             success : true, 
             data : {
+                id : validAuth.id,
                 token : validAuth.token
             }
         })

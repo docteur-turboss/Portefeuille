@@ -8,7 +8,7 @@ import db from "../config/db.js";
 import Facture from "./facture.models.js";
 
 export default class Category {
-  static createCategory = async (params = {user_id, name:"category", icon, type}) => {
+  static createCategory = async (params = {user_id, name:"category", type}) => {
     try {
       let paramsObj = await Category.modelNormilizer(params, true);
       let result_Id = await db("category")
@@ -24,8 +24,13 @@ export default class Category {
     }
   };
 
-  static updateCategory = async (params = {name:undefined, icon, type}, condition = { id }) => {
+  static updateCategory = async (params = {name:undefined, type}, condition = { id }) => {
     try {
+      if(Object.keys(params).length === 0) return CatchErrorMessage(false, {
+        code: errorCode.NotAcceptable,
+        reason: "Merci de donner au moins une valeur de modification.",
+      })
+
       let paramsObj = await Category.modelNormilizer(params);
       let return_Id = await db("category")
         .update(paramsObj, ["id"])
@@ -43,7 +48,7 @@ export default class Category {
 
   static destroyCategory = async (condition = { id, user_id }) => {
     try {
-      if (condition.id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
+      if(Object.keys(condition).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
         reason: "Certaines informations obligatoires sont manquantes.",
       })
@@ -53,9 +58,9 @@ export default class Category {
       let select_info = await Category.selectCategory(condition);
       if (select_info.success == false) return select_info;
 
-      Budget.destroyBudget({category_id : select_info.data[0].id})
-      Transaction.destroyTransaction({category_id : select_info.data[0].id})
-      Facture.destroyFacture({category_id : select_info.data[0].id})
+      await Budget.destroyBudget({category_id : select_info.data[0].id})
+      await Transaction.destroyTransaction({category_id : select_info.data[0].id})
+      await Facture.destroyFacture({category_id : select_info.data[0].id})
 
       let return_Id = await db("category")
       .where(condition)
@@ -69,7 +74,7 @@ export default class Category {
 
   static selectCategory = async (condition = { id, user_id }) => {
     try {
-      if(condition.id == undefined && condition.user_id == undefined)  return CatchErrorMessage(false, {
+      if(Object.keys(condition).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
         reason: "Des paramètres obligatoires sont manquants."
       })
@@ -93,8 +98,8 @@ export default class Category {
   }
 
   /* normalise la data */
-  static modelNormilizer = async ( params = {user_id, name:"category", icon, type}, obligatoire = false ) => {
-    if (obligatoire == true && (!params.name || !params.user_id || !params.icon || !params.type)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
+  static modelNormilizer = async ( params = {user_id, name:"category", type}, obligatoire = false ) => {
+    if (obligatoire == true && (!params.name || !params.user_id || !params.type)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
     if(params.user_id){
       let isRealUser = await VerifTable("user", params.user_id)
@@ -103,7 +108,7 @@ export default class Category {
 
     if(params.name && (params.name.length >= 40 || params.name.length < 3)) throw errorResponse({reason:"Le nom ne doit pas posséder plus de 40 caractère et au minimum 4"})
 
-    if(params.type && (parseInt(params.type) === NaN || params.type > 4 || params.type <= 0)) throw errorResponse({reason:"Le type n'est pas valide"})
+    if(params.type && isNaN((parseInt(params.type)) || params.type > 4 || params.type <= 0)) throw errorResponse({reason:"Le type n'est pas valide"})
 
     return suppNotUsed(params);
   };

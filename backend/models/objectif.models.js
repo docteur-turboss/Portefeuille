@@ -23,6 +23,11 @@ export default class Objectif {
 
   static updateObjectif = async (params = {title, montant, date_cible, montant_touch}, condition = { id }) => {
     try {
+      if(Object.keys(params).length === 0) return CatchErrorMessage(false, {
+        code: errorCode.NotAcceptable,
+        reason: "Merci de donner au moins une valeur de modification.",
+      })
+
       let paramsObj = await Objectif.modelNormilizer(params);
       let return_Id = await db("objectif")
         .update(paramsObj, ["id"])
@@ -40,14 +45,14 @@ export default class Objectif {
 
   static destroyObjectif = async (condition = { id, compte_id, user_id }) => {
     try {
-      if (condition.id == undefined && condition.compte_id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
+      if(Object.keys(condition).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
-        reason: "Certaines informations obligatoires sont manquantes."
+        reason: "Certaines informations obligatoires sont manquantes.",
       })
 
       condition = suppNotUsed(condition)
 
-      let select_info = await Objectif.selectCategory(condition);
+      let select_info = await Objectif.selectObjectif(condition);
       if (select_info.success == false) return select_info;
 
       let return_Id = await db("objectif")
@@ -62,8 +67,8 @@ export default class Objectif {
 
   static selectObjectif = async (condition = { id, user_id, compte_id }) => {
     try {
-        if(condition.id == undefined && condition.compte_id == undefined && condition.user_id == undefined) return CatchErrorMessage(false, {
-          code: errorCode.NotAcceptable,
+      if(Object.keys(condition).length === 0) return CatchErrorMessage(false, {
+        code: errorCode.NotAcceptable,
           reason: "Des paramètres obligatoires sont manquants."
         })
 
@@ -87,11 +92,11 @@ export default class Objectif {
 
   /* normalise la data */
   static modelNormilizer = async ( params = {compte_id, user_id, title, montant, date_cible, montant_touch}, obligatoire = false ) => {
-    if (obligatoire == true && (!params.compte_id || !params.montant || !params.title || !params.date_cible || !params.montant_touch || !params.user_id)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
+    if (obligatoire == true && (!params.compte_id || !params.montant || !params.title || !params.date_cible || params.montant_touch == undefined || !params.user_id)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
     if(params.compte_id){
-      let isRealCompte = await VerifTable("user", params.compte_id)
-      if(isRealCompte.success == false) throw errorResponse({reason:"Utilisateur invalide"})
+      let isRealCompte = await VerifTable("compte", params.compte_id)
+      if(isRealCompte.success == false) throw errorResponse({reason:"Compte invalide"})
     }
 
     if(params.user_id) {
@@ -101,13 +106,14 @@ export default class Objectif {
 
     if(params.title && (params.title.length < 3 || params.title.length > 40)) throw errorResponse({reason:"Le titre doit contenir plus de 3 caractère et moins de 40 caractère"})
 
-    if(params.montant && (parseInt(params.montant) === NaN || params.montant <= 0)) throw errorResponse({reason:"Le montant doit être un nombre positif"})
+    if(params.montant && (isNaN((params.montant)) || params.montant <= 0)) throw errorResponse({reason:"Le montant doit être un nombre positif"})
 
-    if(params.montant_touch && (params.montant_touch !== true && params.montant_touch !== false)) throw errorResponse({reason:"La valeur d'utilisation des réserves du comptes sont invalides"}) 
-    if(params.montant_touch && params.montant_touch === true) params.montant_touch = 1
-    if(params.montant_touch && params.montant_touch === false) params.montant_touch = 0
+    if(params.montant_touch !== undefined && (params.montant_touch !== true && params.montant_touch !== false)) throw errorResponse({reason:"La valeur d'utilisation des réserves du comptes sont invalides"}) 
+    if(params.montant_touch !== undefined && params.montant_touch === true) params.montant_touch = 1
+    if(params.montant_touch !== undefined && params.montant_touch === false) params.montant_touch = 0
 
-    if(params.date_cible && !(params.date_cible instanceof Date && !isNaN(params.date_cible))) throw errorResponse({reason:"La date cible est invalide"})
+    if(params.date_cible && (isNaN(Date.parse(params.date_cible)) && Date.parse(params.date_cible) < Date.now())) throw errorResponse({reason:"La date cible est invalide"})
+    if(params.date_cible) params.date_cible = new Date(params.date_cible).toISOString().slice(0, 19).replace('T', ' ');
     
     return suppNotUsed(params);
   };

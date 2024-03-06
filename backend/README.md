@@ -71,6 +71,7 @@ Returns :
 {
     success: boolean;
     data: {
+        id: int;
         token: string;
     };
 }
@@ -87,6 +88,7 @@ Returns :
 {
     success: boolean;
     data: {
+        id:int;
         token: string;
     };
 }
@@ -121,6 +123,7 @@ Returns :
 {
     success: boolean;
     data: {
+        id: int;
         token: string;
     };
 }
@@ -223,8 +226,7 @@ Returns :
 - category_id (`Int`)
 - rollover (`Boolean`)
 - token (`String`)
-- name (`String`)
-- type (`Int`)
+- montant (`Int`)
 #### & Put Request
 - Cookie : `auth` (`String`)
 
@@ -252,6 +254,7 @@ Return
 ```
 
 #### Get Request
+- category_id (`Int`)
 - user_id (`Int`)
 - id (`Int`)
 
@@ -337,14 +340,12 @@ Returns :
 #### Post Request
 - Cookie : `auth` (`String`)
 
-- [icon (`String`)]
 - token (`String`)
 - name (`String`)
 - type (`Int`)
 #### & Put Request
 - Cookie : `auth` (`String`)
 
-- [icon (`String`)]
 - token (`String`)
 - name (`String`)
 #### & Delete Request
@@ -379,7 +380,6 @@ Returns :
         user_id:int;
         name:string;
         type:int;
-        icon:string;
     }]
 }
 ```

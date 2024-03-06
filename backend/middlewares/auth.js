@@ -1,5 +1,4 @@
 import { ErrorException, errorCode } from '../models/error.models.js';
-import { CatchErrorMessage } from '../models/successResponse.models.js';
 import Transaction from '../models/transaction.models.js';
 import Objectif from '../models/objectif.models.js';
 import Category from '../models/category.models.js';
@@ -23,7 +22,7 @@ export let isAuthenticatedUser = async(req, res, next) =>{
 
     let userInformation = await User.selectUser({id : id, del: false})
     if(userInformation.success === false || userInformation.data[0].token !== AuthTok || userInformation.data[0].cookieSecure !== confirmAuth){
-      return next(new ErrorException(errorCode.Unauthorized, "L'utilisateur n'existe pas ou les informations de sécurité ne sont pas valides."))
+      return next(new ErrorException(errorCode.Unauthorized, "L'utilisateur n'existe pas ou l'utilisateur n'est pas connecté."))
     }
 
     req.UserID = id
@@ -57,11 +56,13 @@ export let hasAuthorisation = async(req, res, next) =>{
     return next(new ErrorException())
   }
 
+  if(params.success == false){
+    return next(new ErrorException(errorCode.NotFound, "Veuillez créer une instance avant de la demander"))
+  }
+
   if(params.data[0]){
     return next()
   }
 
-  return next(new ErrorException(
-    CatchErrorMessage(false, {code: errorCode.Forbidden})
-  ))
+  return next(new ErrorException(errorCode.Forbidden))
 }

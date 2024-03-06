@@ -7,7 +7,8 @@
 - `backend Doc` [source](./backend/README.md)
 
 ## Avancé du projet :
-Version du projet : 0.0.1
+---
+Version du projet : 0.0.3
 - y.x.x = la version y du projet est fini
 - x.y.x = l'étape y est arrivé 
     - 0 : construction

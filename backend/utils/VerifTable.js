@@ -1,3 +1,4 @@
+import { errorCode } from '../models/error.models.js';
 import db from '../config/db.js';
 
 export default async (DBtable, id_params) => {

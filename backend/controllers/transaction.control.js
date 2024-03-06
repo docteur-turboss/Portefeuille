@@ -51,10 +51,12 @@ export let UpdateTransactioncontroller = async (req, res, next) => {
         /*{id:int,category_id:int,compte_id:string,montant:int,date:Date,[commentaire:string,][toaccount:int,]}*/
         let params = await Transaction.updateTransaction(
             {
-                montant_touch: req.fields.montant_touch,
-                date_cible: req.fields.date_cible,
+                category_id: req.fields.category_id,
+                commentaire: req.fields.commentaire,
+                compte_id: req.fields.compte_id,
+                toaccount: req.fields.toaccount,
                 montant: req.fields.montant, 
-                title: req.fields.title
+                date: req.fields.date,
             },{
                 id: req.fields.id
             }
