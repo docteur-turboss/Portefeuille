@@ -55,7 +55,7 @@ export let UpdateUsercontroller = async (req, res, next) => {
     let params = await User.updateUser({
       email : req.fields.email,
       username : req.fields.username,
-      password: (req.fields.password !== undefined)? hashSync(scryptSync(req.fields.password, 'BonsourCetaitUnTest,RetireEnProdSTP.', 24, { N: 1024 }).toString('hex'), 10) : ''
+      password: (req.fields.password !== null)? hashSync(scryptSync(req.fields.password, 'BonsourCetaitUnTest,RetireEnProdSTP.', 24, { N: 1024 }).toString('hex'), 10) : ''
     }, { id: req.UserID });
     if(params.success == false) throw errorResponse(params)
   

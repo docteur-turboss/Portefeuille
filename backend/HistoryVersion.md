@@ -1,3 +1,7 @@
+1.0.2 :
+- Correction de fautes
+- Ajout du RoadMap Backend
+
 1.0.1 : 
 - Correction de fautes
 - Suppression de l'icon de catégory

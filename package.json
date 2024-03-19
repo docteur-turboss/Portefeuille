@@ -1,6 +1,6 @@
 {
   "name": "portefeuille",
-  "version": "0.0.0",
+  "version": "0.0.4",
   "description": "gestion portefeuille",
   "main": "index.js",
   "scripts": {

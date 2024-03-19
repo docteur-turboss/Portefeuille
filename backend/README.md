@@ -20,7 +20,7 @@ This repository contains all Cash Eyes api routes
 **1. Packages**
 
 ```shell
-npm install bcryptjs cookie-parser dotenv email-validator express express-rate-limit formidable knex mysql2 uuid
+npm install
 ```
 
 **2. Create configuration file**
@@ -43,7 +43,14 @@ SECRETCOOKIES="String" # A password for secure cookies
 > [!TIP]
 > To install the database on your server, simply run the file `/config/installation_database.sql`.
 
-
+## Run the backendApp
+For run the bot you need to execute this :
+```shell
+cd ./backend
+npm run dev
+# OR
+node index
+```
 
 ## API
 
@@ -530,7 +537,7 @@ Returns :
 
 
 ---
-### Project progress :
+## Project progress :
 
 Project version: 1.0.0
 - y.x.x = project version y is finished

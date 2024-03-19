@@ -24,7 +24,7 @@ export default class Category {
     }
   };
 
-  static updateCategory = async (params = {name:undefined, type}, condition = { id }) => {
+  static updateCategory = async (params = {name:undefined}, condition = { id }) => {
     try {
       if(Object.keys(params).length === 0) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
@@ -101,14 +101,16 @@ export default class Category {
   static modelNormilizer = async ( params = {user_id, name:"category", type}, obligatoire = false ) => {
     if (obligatoire == true && (!params.name || !params.user_id || !params.type)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
-    if(params.user_id){
+    if(params.user_id && isNaN(parseInt(params.user_id))){
+      throw errorResponse({reason : "L'identifiant d'utilisateur doit être un nombre"})
+    }else if(params.user_id){
       let isRealUser = await VerifTable("user", params.user_id)
       if(isRealUser.success == false) throw errorResponse({reason:"Utilisateur invalide"})
     }
 
-    if(params.name && (params.name.length >= 40 || params.name.length < 3)) throw errorResponse({reason:"Le nom ne doit pas posséder plus de 40 caractère et au minimum 4"})
+    if(params.name.length >= 40 || params.name.length < 3) throw errorResponse({reason:"Le nom ne doit pas posséder plus de 40 caractère et au minimum 4"})
 
-    if(params.type && isNaN((parseInt(params.type)) || params.type > 4 || params.type <= 0)) throw errorResponse({reason:"Le type n'est pas valide"})
+    if(params.type && (isNaN(parseInt(params.type)) || params.type > 4 || params.type <= 0)) throw errorResponse({reason:"Le type n'est pas valide"})
 
     return suppNotUsed(params);
   };

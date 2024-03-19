@@ -94,17 +94,23 @@ export default class Facture {
   static modelNormilizer = async (params = {category_id, user_id, compte_id, montant, repetition, date, title, auto, status: undefined, rappel}, obligatoire = false ) => {
     if (obligatoire == true && (!params.category_id || !params.user_id || !params.compte_id || !params.montant || params.repetition == undefined || !params.date || !params.title || params.auto == undefined || params.status == undefined)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
-    if(params.category_id){
+    if(params.category_id && isNaN(parseInt(params.category_id))){
+      throw errorResponse({reason : "L'identifiant de catégorie doit être un nombre"})
+    }else if(params.category_id){
       let isRealCategory = await VerifTable("category", params.category_id);
       if(isRealCategory.success == false) throw errorResponse({reason:"Catégorie invalide"});
     }
     
-    if(params.user_id){
+    if(params.user_id && isNaN(parseInt(params.user_id))){
+      throw errorResponse({reason : "L'identifiant d'utilisateur doit être un nombre"})
+    }else if(params.user_id){
       let isRealUser = await VerifTable("user", params.user_id);
       if(isRealUser.success == false) throw errorResponse({reason:"Utilisateur invalide"})
     }
     
-    if(params.compte_id){
+    if(params.compte_id && isNaN(parseInt(params.compte_id))){
+      throw errorResponse({reason : "L'identifiant de compte doit être un nombre"})
+    }else if(params.compte_id){
       let isRealCompte = await VerifTable("compte", params.compte_id);
       if(isRealCompte.success == false) throw errorResponse({reason:"Compte invalide"})
     }

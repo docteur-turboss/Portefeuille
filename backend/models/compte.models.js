@@ -101,14 +101,16 @@ export default class Compte {
   static modelNormilizer = async ( params = {user_id, montant, type}, obligatoire = false ) => {
     if (obligatoire == true && ((!params.montant && params.montant !== 0)|| !params.user_id || !params.type)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
-    if(params.user_id){
+    if(params.user_id && isNaN(parseInt(params.user_id))){
+      throw errorResponse({reason : "L'identifiant d'utilisateur doit être un nombre"})
+    }else if(params.user_id){
       let isRealUser = await VerifTable("user", params.user_id)
       if(isRealUser.success == false) throw errorResponse({reason:"Utilisateur invalide"})
     }
 
     if(params.type && (isNaN(parseInt(params.type)) || params.type > 17 || params.type <= 0)) throw errorResponse({reason:"Le type n'est pas valide"})
 
-    if(params.montant && isNaN(parseInt(params.montant))) throw errorResponse({reason:"Le montant doit être un nombre"})
+    if(isNaN(parseInt(params.montant))) throw errorResponse({reason:"Le montant doit être un nombre"})
 
     return suppNotUsed(params);
   };

@@ -94,22 +94,28 @@ export default class Transaction {
   static modelNormilizer = async (params = {category_id, user_id, compte_id, montant, type, date, commentaire, toaccount}, obligatoire = false ) => {
     if (obligatoire == true && (!params.category_id || !params.user_id || !params.montant || !params.type || !params.date)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
 
-    if(params.category_id){
+    if(params.category_id && isNaN(parseInt(params.category_id))){
+      throw errorResponse({reason : "L'identifiant de catégorie doit être un nombre"})
+    }else if(params.category_id){
       let isRealCategory = await VerifTable("category", params.category_id);
       if(isRealCategory.success == false) throw errorResponse({reason:"Catégorie invalide"});
     }
 
-    if(params.user_id){
+    if(params.user_id && isNaN(parseInt(params.user_id))){
+      throw errorResponse({reason : "L'identifiant d'utilisateur doit être un nombre"})
+    }else if(params.user_id){
       let isRealUser = await VerifTable("user", params.user_id);
       if(isRealUser.success == false) throw errorResponse({reason:"Utilisateur invalide"})
     }
 
-    if(params.compte_id){
+    if(params.compte_id && isNaN(parseInt(params.compte_id))){
+      throw errorResponse({reason : "L'identifiant de compte doit être un nombre"})
+    }else if(params.compte_id){
       let isRealCompte = await VerifTable("compte", params.compte_id);
       if(isRealCompte.success == false) throw errorResponse({reason:"Compte invalide"})
     }
 
-    if(params.toaccount && params.type == 3){
+    if(params.toaccount){
       if(params.type != 3) throw errorResponse({reason : "un mauvais type a été fourni pour cette transaction"});
       let isRealDone = await VerifTable("compte", params.compte_id);
       if(isRealDone.success == false) throw errorResponse({reason:"Compte de destination du transfère invalide"})

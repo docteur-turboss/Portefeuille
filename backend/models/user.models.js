@@ -122,7 +122,7 @@ export default class User {
 
   static updateUser = async (params = { username, email, password }, condition = { id, email }) => {
     try {
-      if(Object.keys(params).length === 0) return CatchErrorMessage(false, {
+      if(Object.keys(params).length === 0 || (params.username == null && params.email == null && params.password == "")) return CatchErrorMessage(false, {
         code: errorCode.NotAcceptable,
         reason: "Merci de donner au moins une valeur de modification.",
       })

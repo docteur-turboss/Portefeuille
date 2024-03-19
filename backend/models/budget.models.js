@@ -67,24 +67,24 @@ export default class Budget {
 
   static selectBudget = async (condition = { id, user_id, category_id }) => {
     try {
-        if (Object.keys(condition).length === 0) return CatchErrorMessage(false, {
-          code: errorCode.NotAcceptable,
-          reason: "Des paramètres obligatoires sont manquants."
-        })
-        
-        condition = suppNotUsed(condition)
+      if (Object.keys(condition).length === 0) return CatchErrorMessage(false, {
+        code: errorCode.NotAcceptable,
+        reason: "Des paramètres obligatoires sont manquants."
+      })
+    
+      condition = suppNotUsed(condition)
 
-        let select_info = await db("budget").select("*").where(condition);
+      let select_info = await db("budget").select("*").where(condition);
 
-        if (select_info[0] == undefined) return CatchErrorMessage(false, {
-          code: errorCode.NotFound,
-          reason: "Budget introuvable.",
-        })
-        
-        return {
-            success: true,
-            data: select_info
-        };
+      if (select_info[0] == undefined) return CatchErrorMessage(false, {
+        code: errorCode.NotFound,
+        reason: "Budget introuvable.",
+      })
+      
+      return {
+          success: true,
+          data: select_info
+      };
     } catch (err) {
       return CatchErrorMessage(true,{functionErrorName: "SELECT BUDGET", totalErrParams: err, basefilename:"budget", basedirname: "models"})
     }
@@ -93,15 +93,23 @@ export default class Budget {
   /* normalise la data */
   static modelNormilizer = async ( params = { category_id, user_id, montant, rollover}, obligatoire = false ) => {
     if (obligatoire == true && (!params.category_id || !params.user_id)) throw errorResponse({reason:"Certains paramètres obligatoire sont manquants."});
+    if (params.montant === undefined && params.rollover === undefined) throw errorResponse({reason: "Merci de bien argumenter les champs lors de vos créations ou modifications."})
 
-    if(params.user_id) {
+    if(params.user_id && isNaN(parseInt(params.user_id))){
+      throw errorResponse({reason : "L'identifiant d'utilisateur doit être un nombre"})
+    }else if(params.user_id) {
       let isRealUser = await VerifTable("user", params.user_id)
       if(isRealUser.success == false) throw errorResponse({reason:"Utilisateur invalide"})
     }
 
-    if(params.category_id){
+    if(params.category_id && isNaN(parseInt(params.category_id))){
+      throw errorResponse({reason : "L'identifiant de catégorie doit être un nombre"})
+    }else if(params.category_id){
       let isRealCategory = await VerifTable("category", params.category_id)
-      if(isRealCategory.success == false) throw errorResponse({reason:"Catégorie invalide"})
+      let dbInfo = await db("budget").select("id").where({ category_id: params.category_id });
+      dbInfo = await dbInfo[0];
+
+      if(isRealCategory.success == false || dbInfo !== undefined) throw errorResponse({reason:"Catégorie invalide ou déjà utilisé"})
     }
     
     if(params.montant && (isNaN(parseInt(params.montant)) || params.montant <= 0)) throw errorResponse({reason:"Le montant est un nombre positif"})

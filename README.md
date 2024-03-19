@@ -1,14 +1,21 @@
-# My found
+# Cash Eyes
 
 > Je me dois de vous prévenir que ce projet est pour le moment à usage personnel
 
+Statut de l'application :
+- [ ] Fonctionnel
+- [ ] Utilisable avec bug
+- [x] En dev
 
 ## About
-- `backend Doc` [source](./backend/README.md)
+- `Backend Documentation` [source](./backend/README.md)
+- `RoadMap backend` [source](./backend/RoadMap.md)
+- `Bot documentation` [source](./bot/README.md)
+- `RoadMap bot` [source](./bot/RoadMap.md)
 
 ## Avancé du projet :
 ---
-Version du projet : 0.0.3
+Version du projet : 0.0.4
 - y.x.x = la version y du projet est fini
 - x.y.x = l'étape y est arrivé 
     - 0 : construction
