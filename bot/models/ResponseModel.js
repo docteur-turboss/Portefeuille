@@ -16,10 +16,11 @@ module.exports.TitleResponseEmbed = {
 
 module.exports.DescResponseEmbed = {
     category : {
-        select : "Veuillez selectionner la catégorie voulu",
+        select : "Veuillez selectionner une catégorie",
     },
     budget : {
         rolloverChoice : "Voulez vous cumuler les restes des mois précédents",
+        monthSelect : "Veuillez selectionnez un mois",
         created : "Votre budget a bien été créé"
     }
 }

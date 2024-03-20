@@ -1,3 +1,8 @@
+1.0.3 :
+- Correction d'orthographe du RoadMap
+- Modification du README.md
+- Suppression de la création automatique des catégorie lors de la création du compte
+
 1.0.2 :
 - Correction de fautes
 - Ajout du RoadMap Backend

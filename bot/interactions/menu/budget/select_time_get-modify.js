@@ -8,7 +8,7 @@ module.exports.data = {
     name : "date_filter_budget_getmodify"
 }
 
-module.exports.run = async (interaction, responRes, UserParams, result) => {
+module.exports.run = async (interaction, UserParams, data) => {
     let dataCategory = []
     let resTabFil = await result.data.filter(elem => {
         let tmp =  new Date(elem.date)

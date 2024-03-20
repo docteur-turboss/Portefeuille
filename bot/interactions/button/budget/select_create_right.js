@@ -31,7 +31,7 @@ module.exports.run = async (interaction, UserParams, data) => {
 
         let selectMenu = new StringSelectMenuBuilder()
         .setCustomId("menu_select_budget_create")
-        .setPlaceholder("Sélectionnez une catégorie")
+        .setPlaceholder(DescResponseEmbed.category.select)
         
         for (let i=10*page; i < result.data.length && i < 10*(page+1); i++) {
             let id = result.data[i].id

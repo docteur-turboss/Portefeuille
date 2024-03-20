@@ -1,6 +1,5 @@
 const { SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuOptionBuilder, StringSelectMenuBuilder } = require("discord.js");
-const { colorResponseEmbed, TitleResponseEmbed, DescResponseEmbed } = require("../../../models/ResponseModel");
-const { protocolesEmbedsFooter } = require("../../../models/protocolModel");
+const { colorResponseEmbed, TitleResponseEmbed, DescResponseEmbed, emojiBtn } = require("../../../models/ResponseModel");
 const { TypeCategoryArray } = require("../../../models/ModuleTypeModel");
 const { failResponse } = require("../../../utils/returnFail");
 const { read } = require("../../../models/api/category");
@@ -28,7 +27,7 @@ module.exports.run = async (interaction, userKeys) => {
 
     let selectMenu = new StringSelectMenuBuilder()
     .setCustomId("menu_select_budget_create")
-    .setPlaceholder("Sélectionnez une catégorie")
+    .setPlaceholder(DescResponseEmbed.category.select)
 
     for (let i=0; i < result.data.length && i < 10; i++) {
         let id = result.data[i].id
@@ -51,7 +50,7 @@ module.exports.run = async (interaction, userKeys) => {
         .addComponents(
             new ButtonBuilder()
             .setCustomId('rigth_select_budget_create')
-            .setEmoji('➡')
+            .setEmoji(emojiBtn.right)
             .setStyle(ButtonStyle.Primary)
         ))
     }

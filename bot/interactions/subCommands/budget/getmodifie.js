@@ -1,9 +1,8 @@
-const { SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder} = require("discord.js");
-const { allResponseCat } = require("../../../utils/responseCommandRun");
-const { existData_MenuTime } = require("../../../utils/MenuDate");
+const { SlashCommandSubcommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ButtonBuilder, ButtonStyle} = require("discord.js");
+const { colorResponseEmbed, DescResponseEmbed, TitleResponseEmbed, emojiBtn } = require("../../../models/ResponseModel");
 const { failResponse } = require("../../../utils/returnFail");
 const { read } = require("../../../models/api/budget");
-const { colorResponseEmbed } = require("../../../models/ResponseModel");
+const moment = require('moment');
 
 module.exports.data = new SlashCommandSubcommandBuilder()
 .setName("get-or-update")
@@ -19,15 +18,67 @@ module.exports.run = async (interaction, userParams) => {
         return
     }
 
-    // arrêt de dev ici
+    let cache = {}
+    let resultDate = result.data.map(e => {
+        e = new Date(e.date)
+        let mois = e.getMonth()
+        let annee = e.getFullYear()
 
-    let rowSelect = existData_MenuTime("budget_getmodify", result.data, 0)
+        if(cache[`${mois}/${annee}`]){
+            return null
+        }else{
+            cache[`${mois}/${annee}`]=`${mois}/${annee}`;
+            return e
+        }
+    })
 
-    let embedCreate = new EmbedBuilder()
-    .setDescription("Veuillez selectionnez le mois de modification :")
-    .setColor(colorResponseEmbed.selection)
-    .setTitle('Selection')
+    resultDate = resultDate.filter(e => e != null).sort((a,b)=>a-b).reverse();
+
+    let embedAction = new EmbedBuilder()
+    .setFooter({text : `Page 0`})
+    .setDescription(DescResponseEmbed.budget.monthSelect)
+    .setColor(colorResponseEmbed.selectMenu)
+    .setTitle(TitleResponseEmbed.selectMenu)
     .setTimestamp()
+    
+    let selectMenu = new StringSelectMenuBuilder()
+    .setCustomId('date_filter_budget_getmodify')
+    .setPlaceholder(DescResponseEmbed.budget.monthSelect)
 
-    return await allResponseCat(interaction, false, data, result, embedCreate, rowSelect, true, true)
+
+    for(let i = 0; i < resultDate.length && i<10; i++){
+        if(resultDate[i] !== null){
+            let date = moment(resultDate[i]).locale("fr")
+            let dateDesc = date.format("[Le mois de ]MMMM YYYY")
+            let dateLabel = date.format("MM[/]YYYY")
+            let dateValue = date.format("M[/]YYYY")
+            selectMenu.addOptions(
+                new StringSelectMenuOptionBuilder()
+                .setDescription(dateDesc)
+                .setLabel(dateLabel)
+                .setValue(dateValue)
+            )
+        }
+    }
+
+    let arrComponent = []
+
+    arrComponent.push(new ActionRowBuilder()
+    .addComponents(selectMenu))
+
+    if(10<resultDate){
+        arrComponent.push(new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+            .setCustomId('rigth_select_budget_getmodify')
+            .setEmoji(emojiBtn.right)
+            .setStyle(ButtonStyle.Primary)
+        ))
+    }
+    
+    return await interaction.reply({
+        embeds : [embedAction],
+        components : arrComponent,
+        ephemeral : true
+    })
 }

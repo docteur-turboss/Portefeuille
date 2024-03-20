@@ -84,7 +84,7 @@ npm run dev
 node index
 ```
 
----
+------------
 ## Projet progress :
 
 Project version: 0.0.1
