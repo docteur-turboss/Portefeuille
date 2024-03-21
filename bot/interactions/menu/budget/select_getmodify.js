@@ -1,53 +1,79 @@
 const { ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { allResponseCat } = require("../../../utils/responseCommandRun");
+const { colorResponseEmbed, DescResponseEmbed, TitleResponseEmbed, emojiBtn } = require("../../../models/ResponseModel");
 const { TypeCategoryArray } = require("../../../models/ModuleTypeModel");
-const { read } = require('../../../models/api/category');
+const { failResponse } = require("../../../utils/returnFail");
+const category = require('../../../models/api/category');
+const budget = require('../../../models/api/budget');
+const moment = require('moment');
+
 module.exports.data = {
     name : "menu_select_budget_getmodify"
 }
 
-module.exports.run = async (interaction, responRes, UserParams, result) => {
-    let res = result.filter(e => e.id == responRes.values[0])
-    let data = res[0]
-    
-    let dateData = new Date(data.date)
-    let dateCheck = new Date()
-    
-    let cat = await read({id: data.category_id}, {Cookie : UserParams.cookie, token: UserParams.token})
-    cat = cat.data[0]
+module.exports.middleware = {
+    connected : true,
+}
 
-    let arrDat = dateData.toLocaleDateString("fr-FR", {
-        dateStyle:"long"
-    }).split(" ")
+module.exports.run = async (interaction, UserParams) => {
+    try{
+        console.log(interaction.values[0])
+        let result = await budget.read({id : interaction.values[0]}, UserParams)
+        if(await failResponse(result, interaction) === 1){
+            return
+        }
 
-    let DateResponse = dateCheck.getFullYear()+dateCheck.getMonth() == dateData.getFullYear()+dateData.getMonth()? "Le mois actuel" : arrDat[1]+" "+arrDat[2]
+        resTabFil = result.data[0]
 
-    let embedAction = new EmbedBuilder()
-    .setTitle('Description')
-    .setDescription('Voici les informations de votre budget')
-    .setColor('DarkGreen')
-    .addFields({name : "ID", value : `\`\`\`${data.id}\`\`\``})
-    .addFields({name : "Catégorie du budget", value : `\`\`\`${cat.name}\`\`\``})
-    .addFields({name : "Type de catégorie", value : `\`\`\`${TypeCategoryArray[cat.type - 1].name}\`\`\``})
-    .addFields({name : "Récupère les restes des mois précédents", value : `\`\`\`${data.rollover == 1 ? "Oui" : "Non"}\`\`\``})
-    .addFields({name : "Montant", value : `\`\`\`${data.montant}\`\`\``})
-    .addFields({name: "Date effective du budget", value : `\`\`\`${DateResponse}\`\`\``})
-    .setTimestamp()
+        let cat = await category.read({id : resTabFil.category_id}, UserParams)
+        if(await failResponse(cat, interaction) === 1){
+            return
+        }
+        cat = cat.data[0]
 
-    let btnModify = new ButtonBuilder()
-    .setCustomId("button_modif_budget_getmodify")
-    .setStyle(ButtonStyle.Primary)
-    .setEmoji('🔧')
-    .setLabel("Modifier")
+        let date
+        if(moment(resTabFil.date).isSame(new Date(), 'month')){
+            date = "Le mois actuel"
+        }else{
+            let mom = moment(resTabFil.date).locale('fr')
+            let tmp = mom.fromNow() + ""
+            date = tmp[0].toUpperCase() + tmp.slice(1)
+        }
 
-    let btnDelete = new ButtonBuilder()
-    .setCustomId("button_delete_budget_getmodify")
-    .setStyle(ButtonStyle.Danger)
-    .setEmoji('🗑')
-    .setLabel('Supprimer')
+        let embedAction = new EmbedBuilder()
+        .setDescription(DescResponseEmbed.budget.description)
+        .setTitle(TitleResponseEmbed.description)
+        .setFooter({text : `ID: ${resTabFil.id}`})
+        .setColor(colorResponseEmbed.description)
+        .addFields({name : "ID", value : `\`\`\`${resTabFil.id}\`\`\``})
+        .addFields({name : "Catégorie du budget", value : `\`\`\`${cat.name}\`\`\``})
+        .addFields({name : "ID de la catégorie", value : `\`\`\`${resTabFil.category_id}\`\`\``})
+        .addFields({name : "Type de catégorie", value : `\`\`\`${TypeCategoryArray[cat.type - 1].name}\`\`\``})
+        .addFields({name : "Récupère les restes des mois précédents", value : `\`\`\`${resTabFil.rollover == 1 ? "Oui" : "Non"}\`\`\``})
+        .addFields({name : "Montant", value : `\`\`\`${resTabFil.montant}\`\`\``})
+        .addFields({name: "Date effective du budget", value : `\`\`\`${date}\`\`\``})
+        .setTimestamp()
 
-    let action = new ActionRowBuilder()
-    .addComponents(btnModify, btnDelete)
+        let btnModify = new ButtonBuilder()
+        .setCustomId("button_modif_budget_getmodify")
+        .setLabel(TitleResponseEmbed.modifyBtn)
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji(emojiBtn.modify)
 
-    return allResponseCat(interaction, responRes, UserParams, data, embedAction, [action], false, true)
+        let btnDelete = new ButtonBuilder()
+        .setCustomId("button_delete_budget_getmodify")
+        .setLabel(TitleResponseEmbed.deleteBtn)
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji(emojiBtn.delete)
+
+        let action = new ActionRowBuilder()
+        .addComponents(btnModify, btnDelete)
+
+        return await interaction.update({
+            embeds : [embedAction],
+            components : [action],
+            ephemeral : true
+        })
+    }catch(e){
+        console.log(e)
+    }
 }

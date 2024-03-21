@@ -8,6 +8,8 @@ V2 :
 
 V3 :
 - [ ] Gestion des titres financiers (etf, crypto, actions)
+- [ ] Ajouter un système de sous compte et de super compte
+- [ ] Ajouter un système de sous catégorie et de super catégorie
 
 V4 :
 - [ ] Ajout de connexion pour la mise à jour automatiques des dépenses et investissement

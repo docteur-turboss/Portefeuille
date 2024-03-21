@@ -437,15 +437,15 @@ L'envoie d'un cookie "auth" est fait
 | :-------- | :--: | :---------- |
 | `success` | `Boolean` | Validation si la requête s'est terminé sans problème où inversement |
 | `code` | `Integer` | Le code http de l'erreur |
-| `reason` | `String` | `La raison associé à l'erreur` |
+| `reason` | `String` | La raison associé à l'erreur |
 
 #### Type code
 | Code | Titre | Signification |
 | :--: | :-- | :-- |
 | `401` | `UNAUTHORIZED` | Vous devez être connecter pour avoir cette information |
 | `403` | `FORBIDDEN` | Vous n'avez pas les droits suffisant pour avoir cette information
-| `404` | `NOT FOUND` | Vous quelque chose qui n'existe pas |
-| `406` | `NOT ACCEPTABLE` | Vos paramètres ne sont pas accepté, la raison vous apportera la raison ainsi que le paramètre dérangeant |
+| `404` | `NOT FOUND` | Vous demandez quelque chose qui n'existe pas |
+| `406` | `NOT ACCEPTABLE` | Vos paramètres ne sont pas accepté, la raison vous apportera des détails ainsi que le paramètre dérangeant |
 | `429` | `TO MANY REQUEST` | Vous avez dépasser le nombre requête autorisé dans l'heure, pour des raisons de sécurité vous avez été filtré. |
 | `500` | `INTERNAL SERVER ERROR` | Une erreur interne s'est produite, il est conseillé au développeur de lire les logs pour en connaitre l'origine
 
@@ -1891,9 +1891,6 @@ DELETE /api/v1/transaction
 | `data` | `Objet` | L'objet d'information |
 | `data.id` | `Integer` | L'id de la transaction supprimé |
 | `data.commentaire` | `String` | Le commentaire lié |
-
-> [!CAUTION]
-> Pour l'instant seuls ces types sont disponibles
 
 ##### *Exemple de réponse*
 ```js

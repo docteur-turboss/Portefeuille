@@ -109,7 +109,12 @@ export default class Budget {
       let dbInfo = await db("budget").select("id").where({ category_id: params.category_id });
       dbInfo = await dbInfo[0];
 
-      if(isRealCategory.success == false || dbInfo !== undefined) throw errorResponse({reason:"Catégorie invalide ou déjà utilisé"})
+      let date = new Date()
+      let verif = new Date(dbInfo.date)
+      let todayVerif = `${date.getFullYear()}/${date.getMonth()}`
+      let dayVerif = `${verif.getFullYear()}/${verif.getMonth()}`
+
+      if(isRealCategory.success == false || todayVerif == dayVerif) throw errorResponse({reason:"Catégorie invalide ou déjà utilisé"})
     }
     
     if(params.montant && (isNaN(parseInt(params.montant)) || params.montant <= 0)) throw errorResponse({reason:"Le montant est un nombre positif"})

@@ -1,3 +1,7 @@
+1.0.4 :
+- Correction de faute dans le README
+- Modification du models budget
+
 1.0.3 :
 - Correction d'orthographe du RoadMap
 - Modification du README.md
